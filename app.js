@@ -118,21 +118,25 @@ app.put('/districts/:districtId/', async (request, response) => {
 })
 app.get('/states/:statesId/stats/', async (request, response) => {
   const {stateId} = request.params
-  const getStatisticsOfCases = `
+  const getStateStateQuery = `
     SELECT
-    SUM(cases) AS cases,
-    SUM(cured) AS cured,
-    SUM(active) AS active,
-    SUM(deaths) AS deaths
+    SUM(cases),
+    SUM(cured),
+    SUM(active),
+    SUM(deaths) 
     FROM 
     district
     WHERE
     state_id=${stateId};`;
-  const stateReport = await db.get(getStatisticsOfCases);
-  const resultReport=convertDistrictObjectTOPascalcase(stateReport)
-  response.send(resultReport)
-  
-});
+  const stats = await db.get(getStateStateQuery)
+  console.log(stats)
+  response.send({
+    totalCases:stats["SUM(cases)"],
+    totalCured:stats["SUM(cured)"],
+    totalActive:stats["sum(active)"],
+    totalDeaths:stats["Sum(deaths)"]
+  })
+})
 app.get("/districts/:districtId/details/",async (request, response) => {
 const { districtId } = request.params;
 const stateDetails=`
